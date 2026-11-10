@@ -1,0 +1,1 @@
+"""Quant Intelligence Platform backend."""
