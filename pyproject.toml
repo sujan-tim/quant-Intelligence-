@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "quant-intelligence-platform"
-version = "0.1.0"
+version = "0.2.0"
 description = "A modular, demo-first quantitative market data backend"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -23,6 +23,9 @@ dev = ["pytest>=8,<10", "httpx>=0.27,<1", "ruff>=0.8,<1"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+quant_intelligence = ["static/*.html", "static/*.css", "static/*.js"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

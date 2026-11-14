@@ -17,8 +17,10 @@ services:
     environment:
       QIP_DATABASE_URL: postgresql+psycopg://qip:qip@db:5432/qip
       QIP_DEMO_PROVIDER_ENABLED: "true"
+      QIP_ALPHA_VANTAGE_API_KEY: ${QIP_ALPHA_VANTAGE_API_KEY:-}
+      QIP_MARKET_DATA_ENTITLEMENT: ${QIP_MARKET_DATA_ENTITLEMENT:-historical}
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     depends_on:
       db:
         condition: service_healthy

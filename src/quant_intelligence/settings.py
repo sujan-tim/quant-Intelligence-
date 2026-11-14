@@ -1,4 +1,5 @@
 from functools import lru_cache
+from typing import Literal
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -14,6 +15,8 @@ class Settings(BaseSettings):
     sma_weight: float = Field(default=1.0, ge=0)
     volume_weight: float = Field(default=1.0, ge=0)
     volume_spike_threshold: float = Field(default=2.0, gt=0)
+    alpha_vantage_api_key: str | None = None
+    market_data_entitlement: Literal["historical", "delayed", "realtime"] = "historical"
 
 
 @lru_cache

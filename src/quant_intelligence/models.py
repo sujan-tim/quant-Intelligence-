@@ -1,6 +1,7 @@
 from datetime import UTC, date, datetime
+from decimal import Decimal
 
-from sqlalchemy import Date, DateTime, Float, ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy import Date, DateTime, Float, ForeignKey, Integer, Numeric, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .db import Base
@@ -49,3 +50,27 @@ class SignalSnapshot(Base):
         DateTime(timezone=True), default=lambda: datetime.now(UTC)
     )
     asset: Mapped[Asset] = relationship(back_populates="snapshots")
+
+
+class PaperAccount(Base):
+    __tablename__ = "paper_accounts"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    starting_cash: Mapped[Decimal] = mapped_column(Numeric(18, 2))
+    cash: Mapped[Decimal] = mapped_column(Numeric(18, 2))
+
+
+class PaperOrder(Base):
+    __tablename__ = "paper_orders"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    account_id: Mapped[int] = mapped_column(ForeignKey("paper_accounts.id"), index=True)
+    asset_id: Mapped[int] = mapped_column(ForeignKey("assets.id"), index=True)
+    side: Mapped[str] = mapped_column(String(4))
+    quantity: Mapped[int] = mapped_column(Integer)
+    execution_price: Mapped[Decimal] = mapped_column(Numeric(18, 4))
+    price_date: Mapped[date] = mapped_column(Date)
+    source: Mapped[str] = mapped_column(String(40))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC)
+    )

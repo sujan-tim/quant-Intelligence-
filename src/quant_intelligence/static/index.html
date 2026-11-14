@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#101b2a" />
+    <title>Quant Intelligence</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+    <script src="/static/app.js" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">Q<span class="brand-dot">.</span></span>
+          <span class="brand-name">Quant Intelligence</span>
+          <span class="edition">Local workspace</span>
+        </div>
+        <div class="top-actions">
+          <span id="api-status" class="connection-pill">Checking connection</span>
+          <a href="/docs" target="_blank" rel="noopener">API docs <span aria-hidden="true">↗</span></a>
+        </div>
+      </header>
+
+      <main>
+        <section class="intro" aria-labelledby="page-title">
+          <div>
+            <p class="eyebrow">MARKET RESEARCH WORKSPACE</p>
+            <h1 id="page-title">Explore a stock, understand the numbers.</h1>
+            <p class="intro-copy">Load historical prices, compare simple signals, test a rule on past data, and practice with paper trades. Every result shows its source and date.</p>
+          </div>
+          <div class="intro-meta">
+            <span class="meta-label">WHAT THIS IS</span>
+            <strong>Research and learning</strong>
+            <span>Signals and forecasts are estimates, not instructions to buy or sell.</span>
+          </div>
+        </section>
+
+        <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+
+        <section class="control-card" aria-label="Load market data">
+          <div class="control-copy">
+            <div class="section-kicker">01 <span>GET STARTED</span></div>
+            <h2>Choose your data</h2>
+            <p>Start with fictional examples, or enter a ticker to import real historical daily prices from Alpha Vantage.</p>
+          </div>
+          <div class="control-actions">
+            <button id="load-demo" class="button button-outline" type="button"><span aria-hidden="true">▦</span> Load demo data</button>
+            <form id="live-form" class="live-form">
+              <label for="live-symbol">Real stock symbol</label>
+              <div class="input-row">
+                <input id="live-symbol" name="symbol" type="text" placeholder="e.g. AAPL" maxlength="20" autocomplete="off" spellcheck="false" aria-describedby="live-hint" />
+                <button id="load-live" class="button button-primary" type="submit">Import real market data <span aria-hidden="true">→</span></button>
+              </div>
+              <p id="live-hint" class="field-hint">Requires an Alpha Vantage API key in .env. Daily closing prices are historical, not a live exchange feed.</p>
+            </form>
+          </div>
+        </section>
+
+        <section class="workspace" aria-label="Research results">
+          <aside class="sidebar">
+            <div class="sidebar-head">
+              <div>
+                <div class="section-kicker">02 <span>DISCOVER</span></div>
+                <h2>Watchlist</h2>
+              </div>
+              <span id="asset-count" class="count-badge">0</span>
+            </div>
+            <label class="sr-only" for="asset-filter">Filter loaded assets</label>
+            <input id="asset-filter" class="filter-input" type="search" placeholder="Filter loaded symbols" />
+            <div id="asset-list" class="asset-list"><p class="empty-side">No data loaded yet. Use a button above to begin.</p></div>
+            <div class="side-tip"><span aria-hidden="true">ⓘ</span><p><strong>About scores</strong><br />They count which of four preset conditions are met. They are not a measure of future returns.</p></div>
+          </aside>
+
+          <div class="content-area">
+            <div class="content-topline">
+              <div class="section-kicker">03 <span>ANALYZE</span></div>
+              <span id="data-stamp" class="data-stamp">Select an asset to begin</span>
+            </div>
+            <div id="asset-heading" class="asset-heading">
+              <div><h2>Pick a stock to explore</h2><p>Select an asset in the watchlist after loading data.</p></div>
+            </div>
+            <div class="quote-strip">
+              <div><strong>Latest available quote</strong><span>Requested only when you click. Availability and delay depend on your Alpha Vantage plan.</span></div>
+              <button id="check-quote" class="button button-outline" type="button">Check quote</button>
+              <div id="quote-result" class="quote-result" aria-live="polite">Select an imported real stock to check.</div>
+            </div>
+
+            <nav class="tabbar" aria-label="Analysis views">
+              <button type="button" class="tab active" data-tab="overview" aria-current="page">Overview</button>
+              <button type="button" class="tab" data-tab="forecast">Forecast</button>
+              <button type="button" class="tab" data-tab="backtest">Backtest</button>
+              <button type="button" class="tab" data-tab="paper">Paper trading</button>
+            </nav>
+
+            <section id="overview-panel" class="tab-panel active" aria-label="Asset overview">
+              <div class="overview-grid">
+                <article class="panel price-panel">
+                  <div class="panel-heading"><div><span class="small-label">PRICE HISTORY</span><h3>Closing prices</h3></div><span id="chart-range" class="subtle">Most recent 90 days</span></div>
+                  <div id="price-chart" class="chart-placeholder">Select an asset to view its price history.</div>
+                  <div id="chart-caption" class="chart-caption">Prices are historical observations.</div>
+                </article>
+                <article class="panel score-panel">
+                  <div class="panel-heading"><div><span class="small-label">SCREENING SCORE</span><h3>Conditions met</h3></div></div>
+                  <div id="score-summary" class="score-empty">No score yet</div>
+                  <ul id="score-checks" class="check-list"></ul>
+                </article>
+              </div>
+              <article class="panel ranking-panel">
+                <div class="panel-heading"><div><span class="small-label">COMPARE</span><h3>Loaded assets</h3></div><span class="subtle">Sorted by screening score</span></div>
+                <div class="table-wrap"><table><thead><tr><th>Asset</th><th>Source</th><th>Data date</th><th class="num">Score</th></tr></thead><tbody id="ranking-rows"><tr><td colspan="4" class="empty-cell">Load data to see rankings.</td></tr></tbody></table></div>
+              </article>
+            </section>
+
+            <section id="forecast-panel" class="tab-panel" aria-label="Price forecast" hidden>
+              <article class="panel"><div class="panel-heading"><div><span class="small-label">EXPERIMENTAL</span><h3>Short horizon estimate</h3></div></div>
+                <p class="section-explain">A last-close baseline with a range based on past price movements. It is not an AI prediction or a trading signal.</p>
+                <div class="inline-form"><label for="forecast-days">Trading sessions ahead</label><select id="forecast-days"><option value="1">1</option><option value="5" selected>5</option><option value="10">10</option></select><button id="run-forecast" class="button button-primary" type="button">Calculate estimate</button></div>
+                <div id="forecast-result" class="result-state">Select an asset, then calculate an estimate.</div>
+              </article>
+            </section>
+
+            <section id="backtest-panel" class="tab-panel" aria-label="Historical backtest" hidden>
+              <article class="panel"><div class="panel-heading"><div><span class="small-label">HISTORICAL SIMULATION</span><h3>Test a simple rule</h3></div></div>
+                <p class="section-explain">See how a long-only moving-average rule would have behaved on saved prices, with transaction costs. Past results do not predict future results.</p>
+                <div class="inline-form"><label for="starting-cash">Starting cash</label><div class="money-input"><span>$</span><input id="starting-cash" type="number" min="100" step="100" value="10000" /></div><button id="run-backtest" class="button button-primary" type="button">Run backtest</button></div>
+                <div id="backtest-result" class="result-state">Select an asset, then run a historical simulation.</div>
+              </article>
+            </section>
+
+            <section id="paper-panel" class="tab-panel" aria-label="Paper trading" hidden>
+              <article class="panel"><div class="panel-heading"><div><span class="small-label">PRACTICE ONLY</span><h3>Paper trading</h3></div><span class="practice-badge">No real money</span></div>
+                <p class="section-explain">Practice buying or selling with a simulated account. Orders use the last stored closing price, which may be old.</p>
+                <div id="paper-balance" class="paper-balance">Loading paper account…</div>
+                <form id="paper-order-form" class="inline-form"><label for="paper-quantity">Shares</label><input id="paper-quantity" class="quantity-input" type="number" min="1" step="1" value="1" required /><button id="paper-buy" class="button button-primary" type="submit" data-side="buy">Paper buy</button><button id="paper-sell" class="button button-outline" type="submit" data-side="sell">Paper sell</button></form>
+                <div id="paper-result" class="result-state">Select an asset to place a practice order.</div>
+                <div id="paper-positions" class="positions"></div>
+              </article>
+            </section>
+          </div>
+        </section>
+      </main>
+
+      <footer><span>Quant Intelligence · Local research workspace</span><span>Educational tooling · No live trading or investment advice</span></footer>
+    </div>
+  </body>
+</html>
